@@ -1,0 +1,581 @@
+:root {
+    --primary: #2c3e50;
+    --secondary: #3498db;
+    --accent: #e74c3c;
+    --light: #ecf0f1;
+    --dark: #2c3e50;
+    --gray: #95a5a6;
+    --success: #27ae60;
+    --shadow: 0 5px 15px rgba(0,0,0,0.1);
+    --transition: all 0.3s ease;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.6;
+    padding-top: 56px;
+}
+
+/* Шапка с видео */
+.header {
+    height: 50vh;
+    min-height: 300px;
+    position: relative;
+    color: white;
+}
+
+.header-video {
+    min-width: 100%;
+    min-height: 100%;
+    width: auto;
+    height: auto;
+    object-fit: cover;
+}
+
+.header-overlay {
+    background: rgba(0, 0, 0, 0.7);
+}
+
+/* Навигация */
+.navbar {
+    transition: var(--transition);
+}
+
+    .navbar.scrolled {
+        background: var(--dark) !important;
+        box-shadow: var(--shadow);
+    }
+
+/* Карточки продуктов */
+.card {
+    transition: var(--transition);
+    border: none;
+}
+
+    .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.15) !important;
+    }
+
+/* Карусель отзывов */
+.carousel-control-prev,
+.carousel-control-next {
+    width: 40px;
+    height: 40px;
+    top: 50%;
+    transform: translateY(-50%);
+    opacity: 1;
+}
+
+.carousel-control-prev {
+    left: 10px;
+}
+
+.carousel-control-next {
+    right: 10px;
+}
+
+/* Стили для изображений */
+.object-fit-cover {
+    object-fit: cover;
+}
+
+/* Ссылки в подвале */
+.hover-primary {
+    transition: var(--transition);
+}
+
+    .hover-primary:hover {
+        color: var(--secondary) !important;
+        text-decoration: underline !important;
+    }
+
+/* Анимации */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.fade-in {
+    animation: fadeIn 0.6s ease forwards;
+}
+
+/* Кнопка Fab */
+.btn-primary {
+    background-color: var(--secondary);
+    border-color: var(--secondary);
+}
+
+    .btn-primary:hover {
+        background-color: #2980b9;
+        border-color: #2980b9;
+        transform: translateY(-2px);
+    }
+
+/* Слайдер */
+.testimonials-slider-wrapper {
+    max-width: 100%;
+    margin: 0 auto 30px;
+    position: relative;
+}
+
+.testimonials-slider {
+    transition: transform 0.5s ease-in-out;
+    min-height: 400px;
+}
+
+.testimonial-slide {
+    background: var(--light);
+    border-radius: 12px;
+    box-shadow: var(--shadow);
+    opacity: 0;
+    visibility: hidden;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    margin: 0 auto;
+    transition: opacity 0.5s ease, visibility 0.5s;
+}
+
+    .testimonial-slide.active {
+        opacity: 1;
+        visibility: visible;
+        position: relative;
+    }
+
+.testimonial-image img {
+    transition: transform 0.5s;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.testimonial-slide:hover .testimonial-image img {
+    transform: scale(1.05);
+}
+
+.testimonial-text {
+    color: var(--dark);
+    font-style: italic;
+    position: relative;
+    padding-left: 15px;
+    font-size: 15px;
+    margin-bottom: 20px;
+}
+
+    .testimonial-text:before {
+        content: '"';
+        font-size: 30px;
+        color: var(--secondary);
+        opacity: 0.5;
+        position: absolute;
+        left: 0;
+        top: -5px;
+    }
+
+.testimonial-author {
+    border-top: 1px solid rgba(0,0,0,0.1);
+}
+
+    .testimonial-author p {
+        color: var(--gray);
+    }
+
+.testimonial-date {
+    color: #95a5a6;
+    font-size: 12px;
+    font-style: italic;
+}
+
+/* Кнопки слайдера */
+.slider-btn {
+    position: absolute;
+    top: 100px;
+    transform: translateY(-50%);
+    width: 40px;
+    height: 40px;
+    background: rgba(255, 255, 255, 0.95);
+    border: none;
+    border-radius: 50%;
+    font-size: 16px;
+    color: var(--dark);
+    cursor: pointer;
+    box-shadow: var(--shadow);
+    z-index: 20;
+    transition: var(--transition);
+}
+
+    .slider-btn:hover {
+        background: var(--secondary);
+        color: white;
+        transform: translateY(-50%) scale(1.1);
+    }
+
+.slider-prev {
+    left: 15px;
+}
+
+.slider-next {
+    right: 15px;
+}
+
+/* Индикаторы */
+.slider-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    border: none;
+    background: #ddd;
+    cursor: pointer;
+    transition: var(--transition);
+    padding: 0;
+}
+
+    .slider-dot.active {
+        background: var(--secondary);
+        transform: scale(1.2);
+    }
+
+    .slider-dot:hover {
+        background: var(--secondary);
+    }
+
+/* Анимация появления слайда */
+.testimonial-slide.active {
+    animation: fadeIn 0.5s ease forwards;
+}
+
+/* Форма */
+.contact-form {
+    padding: 50px 0;
+    background: linear-gradient(rgba(44, 62, 80, 0.9), rgba(44, 62, 80, 0.9));
+    background-size: cover;
+    background-position: center;
+    color: white;
+}
+
+.form-wrapper {
+    max-width: 100%;
+    margin: 0 auto;
+    padding: 0 15px;
+}
+
+.form-content h2 {
+    font-size: 28px;
+    margin-bottom: 15px;
+}
+
+.form-content p {
+    margin-bottom: 30px;
+    opacity: 0.9;
+}
+
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+    .form input,
+    .form textarea {
+        padding: 12px;
+        border-radius: 4px;
+        border: none;
+        font-family: inherit;
+        font-size: 16px;
+    }
+
+/* Сообщения формы */
+.form-message {
+    padding: 12px 15px;
+    border-radius: 4px;
+    margin: 10px 0;
+    display: none;
+    font-weight: 500;
+}
+
+    .form-message.success {
+        background-color: rgba(46, 204, 113, 0.1);
+        border: 1px solid #2ecc71;
+        color: #27ae60;
+        display: block;
+    }
+
+    .form-message.error {
+        background-color: rgba(231, 76, 60, 0.1);
+        border: 1px solid #e74c3c;
+        color: #c0392b;
+        display: block;
+    }
+
+    .form-message.info {
+        background-color: rgba(52, 152, 219, 0.1);
+        border: 1px solid #3498db;
+        color: #2980b9;
+        display: block;
+    }
+
+/* Стили для инпутов с ошибкой */
+.form input.error,
+.form textarea.error {
+    border: 2px solid #e74c3c !important;
+    background-color: rgba(231, 76, 60, 0.05);
+}
+
+.form input.valid,
+.form textarea.valid {
+    border: 2px solid #2ecc71 !important;
+    background-color: rgba(46, 204, 113, 0.05);
+}
+
+/* Стили для кнопки загрузки */
+.btn-loader {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Стили для плавного скролла */
+html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 56px; /* Отступ для фиксированной шапки - мобильная версия */
+}
+
+/* Дополнительные стили для меню */
+.nav-menu a.active {
+    color: var(--secondary);
+    font-weight: 600;
+}
+
+/* Планшетная версия*/
+@media (min-width: 576px) {
+    body {
+        padding-top: 60px;
+    }
+
+    html {
+        scroll-padding-top: 60px;
+    }
+
+    .header {
+        height: 60vh;
+        min-height: 400px;
+    }
+
+        .header h1 {
+            font-size: 1.8rem;
+        }
+
+    .testimonial-slide {
+        min-height: 500px;
+    }
+
+        .testimonial-slide .testimonial-image {
+            height: 200px;
+        }
+
+        .testimonial-slide .testimonial-content {
+            padding: 20px;
+        }
+
+    .slider-btn {
+        top: 100px;
+        width: 40px;
+        height: 40px;
+        font-size: 16px;
+    }
+
+    .form-wrapper {
+        max-width: 540px;
+        padding: 0;
+    }
+}
+
+/* Планшетная версия*/
+@media (min-width: 768px) {
+    body {
+        padding-top: 66px;
+    }
+
+    html {
+        scroll-padding-top: 66px;
+    }
+
+    .header {
+        height: 70vh;
+        min-height: 500px;
+    }
+
+        .header h1 {
+            font-size: 2rem;
+        }
+
+    .testimonial-slide {
+        min-height: 450px;
+    }
+
+        .testimonial-slide .testimonial-image {
+            height: 250px;
+            flex-shrink: 0;
+        }
+
+        .testimonial-slide .testimonial-content {
+            padding: 25px;
+        }
+
+    .testimonial-text {
+        font-size: 16px;
+        line-height: 1.6;
+        padding-left: 20px;
+    }
+
+        .testimonial-text:before {
+            font-size: 30px;
+            top: -5px;
+        }
+
+    .slider-btn {
+        width: 45px;
+        height: 45px;
+        font-size: 18px;
+        background: rgba(255, 255, 255, 0.9);
+        top: 125px;
+    }
+
+    .slider-prev {
+        left: 20px;
+    }
+
+    .slider-next {
+        right: 20px;
+    }
+
+    .carousel-control-prev {
+        left: 15px;
+    }
+
+    .carousel-control-next {
+        right: 15px;
+    }
+
+    .contact-form {
+        padding: 75px 0;
+    }
+
+    .form-content h2 {
+        font-size: 32px;
+    }
+
+    .form {
+        gap: 20px;
+    }
+
+        .form input,
+        .form textarea {
+            padding: 15px;
+        }
+}
+
+/* Десктоп версия */
+@media (min-width: 992px) {
+    body {
+        padding-top: 76px;
+    }
+
+    html {
+        scroll-padding-top: 76px;
+    }
+
+    .header {
+        height: 100vh;
+        min-height: 600px;
+    }
+
+    .testimonials-slider-wrapper {
+        max-width: 900px;
+    }
+
+    .testimonial-slide {
+        min-height: 500px;
+    }
+
+        .testimonial-slide .testimonial-image {
+            height: auto;
+        }
+
+    .testimonial-text {
+        font-size: 18px;
+        padding-left: 25px;
+    }
+
+        .testimonial-text:before {
+            font-size: 40px;
+            top: -10px;
+        }
+
+    .slider-btn {
+        width: 50px;
+        height: 50px;
+        font-size: 18px;
+        background: white;
+        top: 50%;
+    }
+
+    .slider-prev {
+        left: -60px;
+    }
+
+    .slider-next {
+        right: -60px;
+    }
+
+    .carousel-control-prev,
+    .carousel-control-next {
+        width: 50px;
+        height: 50px;
+    }
+
+    .carousel-control-prev {
+        left: -25px;
+    }
+
+    .carousel-control-next {
+        right: -25px;
+    }
+
+    .contact-form {
+        padding: 100px 0;
+    }
+
+    .form-content h2 {
+        font-size: 36px;
+    }
+
+    .card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 15px 30px rgba(0,0,0,0.15) !important;
+    }
+}
+
+/* Большие экраны */
+@media (min-width: 1200px) {
+    .testimonials-slider-wrapper {
+        max-width: 1100px;
+    }
+
+    .testimonial-slide {
+        min-height: 550px;
+    }
+
+    .form-wrapper {
+        max-width: 600px;
+    }
+}
