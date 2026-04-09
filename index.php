@@ -33,13 +33,17 @@ $isAjax = !empty($_SERVER['HTTP_X_REQUESTED_WITH']) &&
           strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest';
 
 // Роутинг API запросов
-if (strpos($path, '/api/users') === 0) {
+if (strpos($path, 'api/users') !== false) {
 
     // Определяем ID пользователя из URL
     $userId = null;
-    $parts = explode('/', $path);
-    if (isset($parts[3]) && is_numeric($parts[3])) {
-        $userId = (int)$parts[3];
+    $parts = explode('/', trim($path, '/'));
+    // Для пути "ToolMaster/api/users/123" получим ['ToolMaster', 'api', 'users', '123']
+
+    // ID - последний элемент, если он числовой
+    $lastPart = end($parts);
+    if (is_numeric($lastPart)) {
+        $userId = (int)$lastPart;
     }
 
     $userService = new UserService();
@@ -75,7 +79,7 @@ if (strpos($path, '/api/users') === 0) {
 
             if (!$isAjax) {
                 // Для обычной формы - редирект на страницу успеха
-                header('Location: /success.html?login=' . urlencode($newUser['login']));
+                header('Location: success.html?login=' . urlencode($newUser['login']));
                 exit;
             }
 
@@ -85,7 +89,7 @@ if (strpos($path, '/api/users') === 0) {
                 'id' => $newUser['id'],
                 'login' => $newUser['login'],
                 'password' => $newUser['password'],
-                'profile_url' => '/profile.html?id=' . $newUser['id']
+                'profile_url' => 'profile.html?id=' . $newUser['id']
             ]);
             break;
 

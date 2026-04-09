@@ -288,7 +288,7 @@ function initializeSlider() {
         }
     });
 }
-// Функции для формы
+
 // Функции для формы
 function initializeForm() {
     const contactForm = document.getElementById('contactForm');

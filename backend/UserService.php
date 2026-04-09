@@ -161,6 +161,6 @@ class UserService {
      * Авторизация (установка куки)
      */
     private function authorize(int $userId): void {
-        setcookie('user_id', $userId, time() + 60 * 60 * 24 * 30, '/');
+        setcookie('user_id', $userId, time() + 60 * 60 * 24 * 30, '/ToolMaster/');
     }
 }
