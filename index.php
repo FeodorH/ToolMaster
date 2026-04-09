@@ -1,6 +1,12 @@
 <?php
 // index.php - Единая точка входа
 
+file_put_contents(
+    __DIR__ . '/debug.log',
+    date('Y-m-d H:i:s') . ' | ' . $_SERVER['REQUEST_METHOD'] . ' | ' . $_SERVER['REQUEST_URI'] . "\n",
+    FILE_APPEND
+);
+
 // Включаем отображение ошибок для отладки
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
