@@ -289,16 +289,17 @@ function initializeSlider() {
     });
 }
 // Функции для формы
+// Функции для формы
 function initializeForm() {
     const contactForm = document.getElementById('contactForm');
     if (!contactForm) return;
-    
+
     const formMessage = document.getElementById('form-message');
     const submitBtn = document.getElementById('submit-btn');
     const btnText = submitBtn?.querySelector('.btn-text');
     const btnLoader = submitBtn?.querySelector('.btn-loader');
-    
-    // Валидация поля
+
+    // Валидация отдельного поля
     function validateField(field) {
         const value = field.value.trim();
         let error = '';
@@ -321,13 +322,10 @@ function initializeForm() {
             }
         }
         
-        // Проверка телефона (обновленная регулярка)
+        // Проверка телефона
         else if (field.name === 'phone' && value) {
-            // Разрешаем любой формат с цифрами, скобками, пробелами, дефисами и плюсом
-            const phoneRegex = /^[\+\d][\d\s\-\(\)]{9,}$/;
             const cleanPhone = value.replace(/\D/g, '');
-            
-            if (!phoneRegex.test(value) || cleanPhone.length < 10) {
+            if (cleanPhone.length < 10) {
                 error = 'Введите корректный номер телефона (минимум 10 цифр)';
             }
         }
@@ -348,13 +346,14 @@ function initializeForm() {
             errorDiv.style.cssText = 'color: #e74c3c; font-size: 12px; margin-top: 5px;';
             errorDiv.textContent = error;
             field.parentNode.appendChild(errorDiv);
+            return false;
         } else if (value) {
             field.classList.add('valid');
         }
         
-        return !error;
+        return true;
     }
-    
+
     // Валидация всей формы
     function validateForm() {
         let isValid = true;
@@ -368,8 +367,8 @@ function initializeForm() {
         
         return isValid;
     }
-    
-    // Сообщения формы
+
+    // Отображение сообщений
     function showMessage(type, text) {
         if (!formMessage) return;
         
@@ -381,7 +380,7 @@ function initializeForm() {
             setTimeout(() => formMessage.style.display = 'none', 5000);
         }
     }
-    
+
     // Индикатор загрузки
     function setLoading(isLoading) {
         if (!submitBtn || !btnText || !btnLoader) return;
@@ -390,8 +389,37 @@ function initializeForm() {
         btnText.style.display = isLoading ? 'none' : 'inline';
         btnLoader.style.display = isLoading ? 'inline-flex' : 'none';
     }
-    
-    // Валидация при потере фокуса
+
+    // Получение куки
+    function getCookie(name) {
+        const value = `; ${document.cookie}`;
+        const parts = value.split(`; ${name}=`);
+        if (parts.length === 2) return parts.pop().split(';').shift();
+        return null;
+    }
+
+    // Отображение ошибок с сервера
+    function displayServerErrors(errors) {
+        // Очищаем старые ошибки
+        document.querySelectorAll('.field-error').forEach(el => el.remove());
+        document.querySelectorAll('.error, .valid').forEach(el => {
+            el.classList.remove('error', 'valid');
+        });
+        
+        for (const field in errors) {
+            const input = contactForm.querySelector(`[name="${field}"]`);
+            if (input) {
+                input.classList.add('error');
+                const errorDiv = document.createElement('div');
+                errorDiv.className = 'field-error';
+                errorDiv.style.cssText = 'color: #e74c3c; font-size: 12px; margin-top: 5px;';
+                errorDiv.textContent = errors[field];
+                input.parentNode.appendChild(errorDiv);
+            }
+        }
+    }
+
+    // Валидация при потере фокуса и вводе
     contactForm.querySelectorAll('input, textarea').forEach(input => {
         input.addEventListener('blur', () => validateField(input));
         input.addEventListener('input', function() {
@@ -400,39 +428,156 @@ function initializeForm() {
             if (errorDiv) errorDiv.remove();
         });
     });
-    
-    // Отправка формы
+
+    // Основной обработчик отправки формы
     contactForm.addEventListener('submit', async function(e) {
         e.preventDefault();
         
+        // Проверяем авторизацию (читаем куку user_id)
+        const userId = getCookie('user_id');
+        
+        // Определяем URL и метод
+        let url = this.action; // '/api/users' или другой action из формы
+        let method = 'POST';
+        
+        if (userId) {
+            url = url + '/' + userId;
+            method = 'PUT';
+        }
+
+        // Валидация на клиенте
         if (!validateForm()) {
             showMessage('error', 'Исправьте ошибки в форме');
             return;
         }
-        
+
         setLoading(true);
-        showMessage('info', 'Отправка...');
-        
+        showMessage('info', 'Отправка данных...');
+
+        // Собираем данные формы и преобразуем в JSON
+        const formData = new FormData(contactForm);
+        const jsonData = {};
+        formData.forEach((value, key) => {
+            jsonData[key] = value;
+        });
+
         try {
-            const response = await fetch(this.action, {
-                method: 'POST',
-                body: new FormData(this),
-                headers: { 'Accept': 'application/json' }
+            const response = await fetch(url, {
+                method: method,
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: JSON.stringify(jsonData)
             });
-            
-            if (response.ok) {
-                showMessage('success', 'Сообщение отправлено! Мы скоро свяжемся с вами.');
-                contactForm.reset();
-                contactForm.querySelectorAll('.valid').forEach(el => el.classList.remove('valid'));
-            } else {
-                showMessage('error', 'Ошибка отправки. Попробуйте еще раз.');
+
+            const result = await response.json();
+
+            if (!response.ok) {
+                if (result.errors) {
+                    displayServerErrors(result.errors);
+                    showMessage('error', 'Проверьте правильность заполнения полей');
+                } else {
+                    showMessage('error', result.error || 'Произошла ошибка');
+                }
+                return;
             }
-        } catch {
+
+            // Успешная обработка
+            if (method === 'POST') {
+                // Регистрация нового пользователя
+                showMessage('success', `Регистрация успешна!`);
+                
+                // Показываем данные для входа в красивом модальном окне
+                const modalHtml = `
+                    <div class="modal fade" id="registerSuccessModal" tabindex="-1">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header bg-success text-white">
+                                    <h5 class="modal-title">
+                                        <i class="fas fa-check-circle me-2"></i>Регистрация успешна!
+                                    </h5>
+                                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <p class="mb-3">Сохраните ваши данные для входа:</p>
+                                    <div class="bg-light p-3 rounded">
+                                        <div class="mb-2">
+                                            <strong>Логин:</strong> 
+                                            <span class="user-select-all">${result.login}</span>
+                                        </div>
+                                        <div class="mb-2">
+                                            <strong>Пароль:</strong> 
+                                            <span class="user-select-all">${result.password}</span>
+                                        </div>
+                                        <div>
+                                            <strong>Профиль:</strong> 
+                                            <a href="${result.profile_url}" target="_blank">${result.profile_url}</a>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Понятно</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                // Удаляем старое модальное окно, если есть
+                const oldModal = document.getElementById('registerSuccessModal');
+                if (oldModal) oldModal.remove();
+                
+                // Добавляем новое
+                document.body.insertAdjacentHTML('beforeend', modalHtml);
+                const modal = new bootstrap.Modal(document.getElementById('registerSuccessModal'));
+                modal.show();
+                
+                // Удаляем после закрытия
+                document.getElementById('registerSuccessModal').addEventListener('hidden.bs.modal', function() {
+                    this.remove();
+                });
+                
+                // Ставим куку авторизации
+                document.cookie = `user_id=${result.id}; path=/; max-age=2592000`;
+                
+                // Меняем текст кнопки
+                if (submitBtn) {
+                    submitBtn.innerHTML = '<span class="btn-text">Сохранить изменения</span><span class="btn-loader" style="display: none;"><i class="fas fa-spinner fa-spin"></i> Сохранение...</span>';
+                }
+            } else {
+                // Обновление профиля
+                showMessage('success', 'Профиль успешно обновлен!');
+            }
+
+        } catch (error) {
+            console.error('Ошибка:', error);
             showMessage('error', 'Ошибка сети. Проверьте соединение.');
         } finally {
             setLoading(false);
         }
     });
+
+    // Проверяем при загрузке, авторизован ли пользователь
+    const userId = getCookie('user_id');
+    if (userId) {
+        // Если авторизован, меняем внешний вид формы
+        const submitBtn = document.getElementById('submit-btn');
+        if (submitBtn) {
+            submitBtn.innerHTML = '<span class="btn-text">Сохранить изменения</span><span class="btn-loader" style="display: none;"><i class="fas fa-spinner fa-spin"></i> Сохранение...</span>';
+        }
+        
+        // Можно добавить индикатор авторизации
+        const formTitle = document.querySelector('.form-content h2');
+        if (formTitle) {
+            formTitle.textContent = 'Редактирование профиля';
+        }
+        
+        const formDesc = document.querySelector('.form-content p');
+        if (formDesc) {
+            formDesc.textContent = 'Измените ваши контактные данные';
+        }
+    }
 }
 
 // Фунцкции для навигации
