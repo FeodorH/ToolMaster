@@ -14,6 +14,27 @@
             <a class="navbar-brand" href="index.html">
                 <i class="fas fa-tools me-2"></i>ToolMaster
             </a>
+            
+            <div class="ms-auto d-flex align-items-center">
+                <a href="index.html" class="nav-link text-white me-3">
+                    <i class="fas fa-home"></i>
+                </a>
+                <a href="cart.html" class="nav-link text-white me-3">
+                    <i class="fas fa-shopping-cart"></i>
+                </a>
+                
+                <!-- Кнопки профиля -->
+                <div id="profile-nav-btn" style="display: none;">
+                    <a href="#" id="profile-link" class="nav-link text-white">
+                        <i class="fas fa-user-circle"></i>
+                    </a>
+                </div>
+                <div id="logout-nav-btn" style="display: none;">
+                    <a href="#" id="logout-link" class="nav-link text-white" title="Выйти">
+                        <i class="fas fa-sign-out-alt"></i>
+                    </a>
+                </div>
+            </div>
         </div>
     </nav>
 
@@ -156,6 +177,56 @@
         }
         
         loadProfile();
+
+        // Инициализация кнопок профиля (копия функции из script.js)
+        function initializeProfileButton() {
+            const profileBtn = document.getElementById('profile-nav-btn');
+            const logoutBtn = document.getElementById('logout-nav-btn');
+            const profileLink = document.getElementById('profile-link');
+            const logoutLink = document.getElementById('logout-link');
+            
+            if (!profileBtn || !logoutBtn) return;
+            
+            function getCookie(name) {
+                const value = `; ${document.cookie}`;
+                const parts = value.split(`; ${name}=`);
+                if (parts.length === 2) return parts.pop().split(';').shift();
+                return null;
+            }
+            
+            async function updateNavButtons() {
+                const userId = getCookie('user_id');
+                
+                profileBtn.style.display = 'none';
+                logoutBtn.style.display = 'none';
+                
+                if (userId) {
+                    try {
+                        const response = await fetch(`api/users/${userId}`);
+                        if (response.ok) {
+                            profileLink.href = `profile.html?id=${userId}`;
+                            profileBtn.style.display = 'block';
+                            logoutBtn.style.display = 'block';
+                        } else {
+                            document.cookie = 'user_id=; path=/ToolMaster/; max-age=0';
+                        }
+                    } catch (error) {
+                        console.error('Ошибка:', error);
+                    }
+                }
+            }
+            
+            logoutLink.addEventListener('click', function(e) {
+                e.preventDefault();
+                document.cookie = 'user_id=; path=/ToolMaster/; max-age=0';
+                document.cookie = 'user_id=; path=/; max-age=0';
+                window.location.href = 'index.html';
+            });
+            
+            updateNavButtons();
+        }
+        
+        document.addEventListener('DOMContentLoaded', initializeProfileButton);
     </script>
 </body>
 </html>
