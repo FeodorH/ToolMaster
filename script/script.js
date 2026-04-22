@@ -639,6 +639,8 @@ function initializeNavigation() {
 // Инициализация всего
 document.addEventListener('DOMContentLoaded', () => {
     Cart.init();
+
+	console.log('TEST LOG(!)');
     
     initializeCartButtons();
     
