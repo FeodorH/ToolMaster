@@ -69,7 +69,7 @@
             }
             
             try {
-                const response = await fetch(`/api/users/${userId}`);
+                const response = await fetch(`/ToolMaster/api/users/${userId}`);
                 const user = await response.json();
                 
                 if (response.ok) {
