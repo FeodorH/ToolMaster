@@ -539,7 +539,7 @@ function initializeForm() {
                 });
                 
                 // Ставим куку авторизации
-                document.cookie = `user_id=${result.id}; path=/; max-age=2592000`;
+                //document.cookie = `user_id=${result.id}; path=/; max-age=2592000`;
                 
                 // Меняем текст кнопки
                 if (submitBtn) {
