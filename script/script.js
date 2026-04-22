@@ -429,27 +429,33 @@ function initializeForm() {
         });
     });
 
-    // Основной обработчик отправки формы
+	// Основной обработчик отправки формы
     contactForm.addEventListener('submit', async function(e) {
         e.preventDefault();
+        console.log('🚀 ФОРМА ОТПРАВЛЕНА!');
         
         // Проверяем авторизацию (читаем куку user_id)
         const userId = getCookie('user_id');
+        console.log('🍪 userId из куки:', userId);
         
         // Определяем URL и метод
-        let url = this.action; // '/api/users' или другой action из формы
+        let url = this.action;
         let method = 'POST';
         
         if (userId) {
             url = url + '/' + userId;
             method = 'PUT';
         }
+        
+        console.log('📡 URL:', url, 'Method:', method);
 
         // Валидация на клиенте
         if (!validateForm()) {
+            console.log('❌ Валидация не пройдена');
             showMessage('error', 'Исправьте ошибки в форме');
             return;
         }
+        console.log('✅ Валидация пройдена');
 
         setLoading(true);
         showMessage('info', 'Отправка данных...');
@@ -460,8 +466,10 @@ function initializeForm() {
         formData.forEach((value, key) => {
             jsonData[key] = value;
         });
+        console.log('📦 Данные формы:', jsonData);
 
         try {
+            console.log('📤 Отправляем fetch...');
             const response = await fetch(url, {
                 method: method,
                 headers: {
@@ -470,10 +478,13 @@ function initializeForm() {
                 },
                 body: JSON.stringify(jsonData)
             });
+            console.log('📥 Ответ получен, status:', response.status, 'ok:', response.ok);
 
             const result = await response.json();
+            console.log('📦 result:', result);
 
             if (!response.ok) {
+                console.log('❌ response не OK');
                 if (result.errors) {
                     displayServerErrors(result.errors);
                     showMessage('error', 'Проверьте правильность заполнения полей');
@@ -483,14 +494,15 @@ function initializeForm() {
                 return;
             }
 
+            console.log('✅ response OK, method =', method);
+
             // Успешная обработка
             if (method === 'POST') {
-                // Регистрация нового пользователя
+                console.log('🎉 POST - начинаем регистрацию');
+                
                 showMessage('success', `Регистрация успешна!`);
                 
-                // Показываем данные для входа в красивом модальном окне
-                const modalHtml = `
-                    <div class="modal fade" id="registerSuccessModal" tabindex="-1">
+                const modalHtml = `<div class="modal fade" id="registerSuccessModal" tabindex="-1">
                         <div class="modal-dialog">
                             <div class="modal-content">
                                 <div class="modal-header bg-success text-white">
@@ -522,80 +534,57 @@ function initializeForm() {
                             </div>
                         </div>
                     </div>
-                `;
+					`; // ваш HTML
                 
-                // Удаляем старое модальное окно, если есть
                 const oldModal = document.getElementById('registerSuccessModal');
                 if (oldModal) oldModal.remove();
                 
-                // Добавляем новое
                 document.body.insertAdjacentHTML('beforeend', modalHtml);
+                console.log('🎉 Модалка добавлена');
+                
                 const modal = new bootstrap.Modal(document.getElementById('registerSuccessModal'));
                 modal.show();
+                console.log('🎉 Модалка показана');
                 
-                // Удаляем после закрытия
                 document.getElementById('registerSuccessModal').addEventListener('hidden.bs.modal', function() {
                     this.remove();
                 });
-                
-                // Ставим куку авторизации
-                //document.cookie = `user_id=${result.id}; path=/; max-age=2592000`;
 
-		// Обновляем кнопки навигации после регистрации
-console.log('🔥 Таймер запущен, result.id =', result.id);
+                console.log('🔥 Перед setTimeout, result.id =', result.id);
 
-setTimeout(() => {
-    console.log('⏰ Таймер сработал!');
-    
-    const userId = result.id;
-    console.log('userId из result:', userId);
-    
-    if (userId) {
-        const profileBtn = document.getElementById('profile-nav-btn');
-        const logoutBtn = document.getElementById('logout-nav-btn');
-        const profileLink = document.getElementById('profile-link');
-        
-        console.log('Элементы:', { profileBtn, logoutBtn, profileLink });
-        
-        if (profileBtn) {
-            profileBtn.style.display = 'block';
-            console.log('✅ profileBtn показан');
-        } else {
-            console.error('❌ profileBtn НЕ НАЙДЕН!');
-        }
-        
-        if (logoutBtn) {
-            logoutBtn.style.display = 'block';
-            console.log('✅ logoutBtn показан');
-        } else {
-            console.error('❌ logoutBtn НЕ НАЙДЕН!');
-        }
-        
-        if (profileLink) {
-            profileLink.href = `profile.html?id=${userId}`;
-            console.log('✅ profileLink обновлен');
-        } else {
-            console.error('❌ profileLink НЕ НАЙДЕН!');
-        }
-    } else {
-        console.error('❌ userId не найден в result!');
-    }
-}, 300);
+                setTimeout(() => {
+                    console.log('⏰ Таймер сработал!');
+                    const userId = result.id;
+                    if (userId) {
+                        const profileBtn = document.getElementById('profile-nav-btn');
+                        const logoutBtn = document.getElementById('logout-nav-btn');
+                        const profileLink = document.getElementById('profile-link');
+                        
+                        console.log('Элементы:', { profileBtn, logoutBtn, profileLink });
+                        
+                        if (profileBtn) profileBtn.style.display = 'block';
+                        if (logoutBtn) logoutBtn.style.display = 'block';
+                        if (profileLink) profileLink.href = `profile.html?id=${userId}`;
+                        
+                        console.log('✅ Кнопки обновлены');
+                    }
+                }, 300);
                 
-                // Меняем текст кнопки
                 if (submitBtn) {
                     submitBtn.innerHTML = '<span class="btn-text">Сохранить изменения</span><span class="btn-loader" style="display: none;"><i class="fas fa-spinner fa-spin"></i> Сохранение...</span>';
                 }
+                console.log('🎉 POST обработка завершена');
             } else {
-                // Обновление профиля
+                console.log('🔄 PUT обработка');
                 showMessage('success', 'Профиль успешно обновлен!');
             }
 
         } catch (error) {
-            console.error('Ошибка:', error);
+            console.error('💥 ОШИБКА:', error);
             showMessage('error', 'Ошибка сети. Проверьте соединение.');
         } finally {
             setLoading(false);
+            console.log('🏁 Обработчик завершён');
         }
     });
 
