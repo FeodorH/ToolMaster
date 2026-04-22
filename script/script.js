@@ -617,6 +617,8 @@ document.addEventListener('DOMContentLoaded', () => {
     initializeForm();
     
     initializeNavigation();
+
+    initializeProfileButton();
 });
 
 // Функция для управления кнопкой профиля в навигации
