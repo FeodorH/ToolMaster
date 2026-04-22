@@ -160,9 +160,19 @@ class UserService {
     /**
      * Авторизация (установка куки)
      */
-    private function authorize(int $userId): void {
-        setcookie('user_id', '', time() - 3600, '/');
-        
-        setcookie('user_id', $userId, time() + 60 * 60 * 24 * 30, '/ToolMaster/');
+private function authorize(int $userId): void {
+    // Проверяем, не авторизован ли уже пользователь с ЭТИМ же ID
+    if (isset($_COOKIE['user_id']) && $_COOKIE['user_id'] == $userId) {
+        error_log("AUTHORIZE SKIPPED: user already authorized with this ID");
+        return; // НЕ устанавливаем куку повторно!
     }
+    
+    error_log("=== AUTHORIZE CALLED for user_id=$userId ===");
+    
+    // Сначала удаляем возможную куку с путём /
+    setcookie('user_id', '', time() - 3600, '/ToolMaster/');
+    
+    // Затем ставим правильную
+    setcookie('user_id', $userId, time() + 60 * 60 * 24 * 30, '/ToolMaster/');
+}
 }

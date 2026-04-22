@@ -540,6 +540,47 @@ function initializeForm() {
                 
                 // Ставим куку авторизации
                 //document.cookie = `user_id=${result.id}; path=/; max-age=2592000`;
+
+		// Обновляем кнопки навигации после регистрации
+console.log('🔥 Таймер запущен, result.id =', result.id);
+
+setTimeout(() => {
+    console.log('⏰ Таймер сработал!');
+    
+    const userId = result.id;
+    console.log('userId из result:', userId);
+    
+    if (userId) {
+        const profileBtn = document.getElementById('profile-nav-btn');
+        const logoutBtn = document.getElementById('logout-nav-btn');
+        const profileLink = document.getElementById('profile-link');
+        
+        console.log('Элементы:', { profileBtn, logoutBtn, profileLink });
+        
+        if (profileBtn) {
+            profileBtn.style.display = 'block';
+            console.log('✅ profileBtn показан');
+        } else {
+            console.error('❌ profileBtn НЕ НАЙДЕН!');
+        }
+        
+        if (logoutBtn) {
+            logoutBtn.style.display = 'block';
+            console.log('✅ logoutBtn показан');
+        } else {
+            console.error('❌ logoutBtn НЕ НАЙДЕН!');
+        }
+        
+        if (profileLink) {
+            profileLink.href = `profile.html?id=${userId}`;
+            console.log('✅ profileLink обновлен');
+        } else {
+            console.error('❌ profileLink НЕ НАЙДЕН!');
+        }
+    } else {
+        console.error('❌ userId не найден в result!');
+    }
+}, 300);
                 
                 // Меняем текст кнопки
                 if (submitBtn) {
