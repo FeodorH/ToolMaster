@@ -618,3 +618,85 @@ document.addEventListener('DOMContentLoaded', () => {
     
     initializeNavigation();
 });
+
+// Функция для управления кнопкой профиля в навигации
+function initializeProfileButton() {
+    const profileBtn = document.getElementById('profile-nav-btn');
+    const logoutBtn = document.getElementById('logout-nav-btn');
+    const profileLink = document.getElementById('profile-link');
+    const logoutLink = document.getElementById('logout-link');
+    const loadingIndicator = document.getElementById('profile-loading');
+    
+    if (!profileBtn || !logoutBtn) return;
+    
+    // Функция получения куки
+    function getCookie(name) {
+        const value = `; ${document.cookie}`;
+        const parts = value.split(`; ${name}=`);
+        if (parts.length === 2) return parts.pop().split(';').shift();
+        return null;
+    }
+    
+    // Функция обновления кнопок в навигации
+    async function updateNavButtons() {
+        const userId = getCookie('user_id');
+        
+        // Показываем загрузку
+        if (loadingIndicator) loadingIndicator.style.display = 'block';
+        profileBtn.style.display = 'none';
+        logoutBtn.style.display = 'none';
+        
+        if (userId) {
+            // Пользователь авторизован
+            try {
+                // Проверяем, что пользователь существует
+                const response = await fetch(`api/users/${userId}`);
+                if (response.ok) {
+                    // Устанавливаем ссылку на профиль
+                    profileLink.href = `profile.html?id=${userId}`;
+                    profileBtn.style.display = 'block';
+                    logoutBtn.style.display = 'block';
+                } else {
+                    // Кука есть, но пользователь не найден - очищаем куку
+                    document.cookie = 'user_id=; path=/ToolMaster/; max-age=0';
+                }
+            } catch (error) {
+                console.error('Ошибка проверки профиля:', error);
+            }
+        }
+        
+        // Скрываем загрузку
+        if (loadingIndicator) loadingIndicator.style.display = 'none';
+    }
+    
+    // Обработчик выхода
+    logoutLink.addEventListener('click', function(e) {
+        e.preventDefault();
+        
+        // Удаляем куку
+        document.cookie = 'user_id=; path=/ToolMaster/; max-age=0';
+        document.cookie = 'user_id=; path=/; max-age=0';
+        
+        // Очищаем localStorage (если там есть данные формы)
+        localStorage.removeItem('toolmaster_cart');
+        
+        // Обновляем кнопки
+        updateNavButtons();
+        
+        // Показываем уведомление
+        Cart.showNotification('Вы вышли из аккаунта');
+        
+        // Если мы на странице профиля - редирект на главную
+        if (window.location.pathname.includes('profile.html')) {
+            setTimeout(() => {
+                window.location.href = 'index.html';
+            }, 1000);
+        }
+    });
+    
+    // Инициализация
+    updateNavButtons();
+    
+    // Обновляем кнопки при изменении кук (для SPA-like поведения)
+    window.addEventListener('focus', updateNavButtons);
+}
